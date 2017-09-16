@@ -4,7 +4,9 @@ addpath('\\filestore.soton.ac.uk\users\cnd1g15\mydocuments\MATLAB\TDMS\tdmsSubfu
 
 
 DataDir  = '\\filestore.soton.ac.uk\users\cnd1g15\mydocuments\Projects\BioWaMet\data\membFouling\';
+SaveDir = '\\filestore.soton.ac.uk\users\cnd1g15\mydocuments\Projects\BioWaMet\results\membFouling';
 
-list = DataCleaning(DataDir,{'20170823094547.tdms'}); % 
+
+list = DataCleaning(DataDir,SaveDir); % 
 
 % dataFile = TDMS_getStruct([DataDir '\' list(1).name]);
