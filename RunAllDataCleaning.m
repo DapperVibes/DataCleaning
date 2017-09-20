@@ -7,6 +7,6 @@ DataDir  = '\\filestore.soton.ac.uk\users\cnd1g15\mydocuments\Projects\BioWaMet\
 SaveDir = '\\filestore.soton.ac.uk\users\cnd1g15\mydocuments\Projects\BioWaMet\results\membFouling';
 
 
-list = DataCleaning(DataDir,SaveDir); % 
+list = DataCleaning(DataDir,SaveDir); % ,{'20170821112611.tdms'}
 
 % dataFile = TDMS_getStruct([DataDir '\' list(1).name]);

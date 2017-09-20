@@ -13,12 +13,13 @@ function [list] = DataCleaning(sataDir,saveDir,varargin)
 %    FilesToAnalyze - Cell array of files to analyze
 %
 % Outputs:
-%    list           - List of files analyzed
+%    list           - List of files cleaned
 %
 % Example: 
-%    Line 1 of example
-%    Line 2 of example
-%    Line 3 of example
+% DataDir  = '\\filestore.soton.ac.uk\users\cnd1g15\mydocuments\Projects\BioWaMet\data\membFouling\';
+% SaveDir = '\\filestore.soton.ac.uk\users\cnd1g15\mydocuments\Projects\BioWaMet\results\membFouling';
+% 
+% list = DataCleaning(DataDir,SaveDir)
 %
 % Other m-files required: TDMS toolbox
 % Subfunctions: TDMS toolbox
@@ -30,7 +31,8 @@ function [list] = DataCleaning(sataDir,saveDir,varargin)
 % Universiy of Southampton
 % email: C.N.Dolder@soton.ac.uk
 % Website: https://github.com/DapperVibes
-% Sep 2017; Last revision: 16-Sep-2017
+% Sep 2017; Last revision: 20-Sep-2017
+SelfVersion =  'V 005';
 
 %------------- BEGIN CODE --------------
 
@@ -95,27 +97,61 @@ for i = 1:length(list)
     
     pause(0.05)
     
-    saveMatrix = [dataFile.Membranes.Time.data.', mass];
+    saveMatrix = [dataFile.Membranes.Time.data.',...
+        dataFile.Membranes.Distance_1__mm_.data.',...
+        mass(:,1),...
+        dataFile.Membranes.Pump_1__1_0_.data.',...
+        dataFile.Membranes.Distance_1__mm_.data.',...
+        mass(:,1),...
+        dataFile.Membranes.Pump_1__1_0_.data.',...
+        dataFile.Membranes.Temp_1__deg_C_.data.',...
+        dataFile.Membranes.Temp_2__deg_C_.data.'];
     
-    % Save cleaned data and meta-data to csv files
+    % Extract meta-data
+    
+    % Check if Code_Version exists, if so record version, of not assume 3
+    if isfield(dataFile.Membranes.Props,'DAQ_Version')
+        Version = dataFile.Membranes.Props.Code_Version;
+    else
+        Version = 'V 003';
+    end
+    
+    %% Save meta-data to csv files
+    
+    MetaData = {'Parameter' 'Value';...
+        'Data_Author',dataFile.Membranes.Props.Data_Author;...
+        'Note',dataFile.Membranes.Props.Note;...
+        'DateTime_Start',dataFile.Membranes.Props.DateTime_Start;...
+        'Byte_Count',dataFile.Membranes.Props.Byte_Count;...
+        'Sample_Period',dataFile.Membranes.Props.Sample_Period;...
+        'DAQ_Version',Version;...
+        'Clean_Version',SelfVersion};
+        
+    outMetaFile = [saveDir '\' list{i}(1:(end-5)) 'Meta.csv'];
+    
+    %write header to file
+    fid = fopen(outMetaFile,'w');
+    if fid == -1; error('Cannot open file: %s', outMetaFile); end
+    for j = 1:length(MetaData)
+        fprintf(fid,[MetaData{j,1} ',' MetaData{j,2} '\n']);
+    end
+    fclose(fid);
 
-    cHeader = {'Time' 'Mass1' 'Mass2'}; % Data File Header
+    %% Save cleaned data to csv files
+
+    cHeader = {'Time [s]' 'Distance1 [mm]' 'Mass1 [g]' 'Pump1 [1/0]'...
+        'Distance2 [mm]' 'Mass2 [g]' 'Pump1 [1/0]'...
+        'Temp1 [degC]' 'Temp1 [degC]'}; % Data File Header
     textHeader = strjoin(cHeader, ',');
     
-    outFile = [saveDir '\' list{i}(1:(end-5)) '.csv'];
+    outFile = [saveDir '\' list{i}(1:(end-5)) 'StepOne.csv'];
     
     %write header to file
     fid = fopen(outFile,'w');
     if fid == -1; error('Cannot open file: %s', outFile); end
     fprintf(fid,'%s\n',textHeader);
-%     for i = 1:length(mass)
-%         fprintf(fid, '%1.12f, %d, %d\n', saveMatrix(i,:));
-%     end
     fclose(fid);
     
-    %write data to end of file
-%     dlmwrite([saveDir '\' list{i}(1:(end-5)) '.csv'],saveMatrix,...
-%         '-append','precision',12);
     dlmwrite(outFile,saveMatrix,'-append','delimiter',',','precision','%4.6f')
     
 end
