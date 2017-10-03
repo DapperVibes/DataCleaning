@@ -7,9 +7,9 @@ dataDir  = '\\filestore.soton.ac.uk\users\cnd1g15\mydocuments\Projects\BioWaMet\
 resultsDir = '\\filestore.soton.ac.uk\users\cnd1g15\mydocuments\Projects\BioWaMet\results\membFouling';
 
 
-% list = DataCleaning(dataDir,resultsDir); % ,{'20170821112611.tdms'}
+list = DataCleaning(dataDir,resultsDir); % ,{'20170821112611.tdms'}
 
-[data,fluxData,fluxTime] = CalculateFlux(resultsDir,'20170821112611',100);
+% [data,fluxData,fluxTime] = CalculateFlux(resultsDir,'20170821112611',100);
 
 % timeData = data.data(:,1);
 % dt = data.data(2,1)-data.data(1,1);

@@ -4,6 +4,7 @@ function [list] = DataCleaning(sataDir,saveDir,varargin)
 % the first digit or registers as zero. The algorhythm corrects those data
 % points by setting all values below 200 g to NaN and then interpolating
 % over NaNs. The corrected data is then saved in .csv format.
+% Now ignores files under 15 kb in size.
 %
 % Syntax:  [] = DataCleaning()
 %
@@ -31,8 +32,8 @@ function [list] = DataCleaning(sataDir,saveDir,varargin)
 % Universiy of Southampton
 % email: C.N.Dolder@soton.ac.uk
 % Website: https://github.com/DapperVibes
-% Sep 2017; Last revision: 20-Sep-2017
-SelfVersion =  'V 005';
+% Sep 2017; Last revision: 03-Oct-2017
+SelfVersion =  'V 006';
 
 %------------- BEGIN CODE --------------
 
@@ -44,11 +45,20 @@ if exist('filesToAnalyze','var')
     list = filesToAnalyze;
 else
     temp = dir([sataDir '\*.tdms']);
+    % Eliminate files less than 15 kb.
+    elimIdx = [];
+    for i = 1:length(temp)
+        if temp(i).bytes<15000
+            elimIdx = [elimIdx i]; %#ok<AGROW>
+        end
+    end
+    temp(elimIdx) = [];
     list = cell(1,length(temp));
     for i = 1:length(temp)
         list{i} = temp(i).name;
     end
 end
+
 
 % Print summary (might be excluded later)
 for i = 1:length(list)
